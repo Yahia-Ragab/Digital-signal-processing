@@ -3,7 +3,10 @@ import os
 from scipy.io import wavfile
 from scipy.fft import fft
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
 import shutil
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def frame_signal(signal, frame_length, frame_step):
     signal_length = len(signal)
@@ -131,6 +134,17 @@ def main():
         correct = sum(1 for p, a in zip(predictions, actuals) if a == c and p == c)
         total = sum(1 for a in actuals if a == c)
         print(f"{c}: {(correct/total*100 if total>0 else 0):.2f}% ({correct}/{total})")
+
+    class_indices = {c: i for i, c in enumerate(classes)}
+    y_true = [class_indices[a] for a in actuals]
+    y_pred = [class_indices[p] for p in predictions]
+    cm = confusion_matrix(y_true, y_pred)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', xticklabels=classes, yticklabels=classes)
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title('Confusion Matrix')
+    plt.show()
 
 if __name__ == "__main__":
     main()
