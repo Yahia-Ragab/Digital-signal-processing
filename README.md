@@ -1,30 +1,100 @@
 # Distance-Based Speech Recognition
 
-This project implements a simple **distance-based speech recognition system** using Python. The system classifies short speech commands by comparing spectral features of the audio signals.
+This project implements a simple **distance-based speech recognition system** in Python.
+The system classifies short speech commands by comparing FFT-based spectral features with class templates.
 
-**Dataset:** [Mini Speech Commands](http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip)
+![System Pipeline](figure.png)
 
-## Project Steps
+## Dataset
 
-1. **Frame the audio signal**
-   The audio waveform is divided into short overlapping frames to capture local temporal information.
+The project uses the **Mini Speech Commands** dataset:
+[http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip](http://storage.googleapis.com/download.tensorflow.org/data/mini_speech_commands.zip)
 
-2. **Compute spectral features using FFT**
-   For each frame, the Fast Fourier Transform (FFT) is applied to extract spectral features that represent the frequency content of the signal.
+## Overview
 
-3. **Compute class templates (training set)**
-   For each speech class, the average of all frame-level spectra is computed. This serves as a reference template for the class.
+The system follows these main steps:
 
-4. **Extract features for testing**
-   The test audio signal is framed, and FFT features are computed for each frame.
+### 1. Frame the Audio Signal
 
-5. **Distance-based classification**
-   The distance between the test features and each class template is computed. The class with the smallest distance is selected as the predicted label.
+The audio waveform is divided into fixed-length overlapping frames to capture local time-domain information.
 
-6. **Evaluate accuracy**
-   The predicted classes are compared with the true labels to compute the classification accuracy.
+### 2. Compute Spectral Features (FFT)
 
-## Notes
+Each frame is transformed into the frequency domain using the **Fast Fourier Transform (FFT)**.
+These spectral magnitudes represent the main features used for classification.
 
-* This approach is simple yet effective for small speech command datasets.
-* It can serve as a baseline before applying more complex models like CNNs or RNNs.
+### 3. Build Class Templates (Training Phase)
+
+For each speech class:
+
+* FFT features of all training audio files are calculated.
+* Frames are padded to equalize feature dimensions.
+* A **template** is computed as the average FFT feature matrix of the class.
+
+### 4. Extract Test Features
+
+For every test audio file:
+
+* Frames are created.
+* FFT features are computed using the same parameters.
+
+### 5. Classify Using Distance
+
+The test features are compared with each class template using a chosen distance metric:
+
+* Euclidean
+* Cosine
+* Correlation
+
+The class with the smallest distance is selected as the prediction.
+
+### 6. Compute Accuracy
+
+Predicted labels are compared with true labels to calculate:
+
+* Overall system accuracy
+* Per-class accuracy
+* Confusion matrix for detailed performance evaluation
+
+## Features of This Implementation
+
+* Distance-based template matching
+* FFT spectral feature extraction
+* Automatic framing and padding
+* Train/test split
+* Confusion matrix visualization
+* Configurable distance metric
+* Works directly on raw `.wav` files
+* No neural networks required
+
+## Project Folder Structure
+
+```
+project/
+│── data/
+│   └── mini_speech_commands/
+│── main.py
+│── README.md
+│── figure.png
+```
+
+## Requirements
+
+Install dependencies:
+
+## Running the Project
+
+Run the script:
+
+```bash
+python main.py
+```
+
+This will:
+
+* Compute class templates
+* Test on unseen samples
+* Display accuracy
+* Show the confusion matrix
+
+---
